@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Video Info</h1>
+    <form action="">
+      <div>
+        <label for="">Select a video</label>
+        <input type="file" accept="video/*" />
+      </div>
+      <button type="submit">Get Info</button>
+    </form>
+    <h1 id="result"></h1>
+    <script>
+      // 在 electron 项目中，前端也可以执行 node.js 的代码
+      const electron = require('electron');
+      // 前端使用 ipcRender 实现前后端信息交互
+      const { ipcRenderer } = electron;
+      // 我们使用 ipc 在前端页面与 electron 后端进行沟通
+      document.querySelector('form').addEventListener('submit', event => {
+        event.preventDefault();
+        const { path } = document.querySelector('input').files[0];
+        // console.log('video path:' + path);
+        ipcRenderer.send('video:submit', path);
+        console.log('sent');
+      });
+      // 接收后端返回的信息
+      ipcRenderer.on('video:metadata', (event, duration) => {
+        document.querySelector(
+          '#result'
+        ).innerHTML = `Video is ${duration} seconds.`;
+      });
+    </script>
+  </body>
+</html>
